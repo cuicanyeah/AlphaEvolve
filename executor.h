@@ -52,14 +52,10 @@ constexpr double kPadLabel = 0.0;
 
 template <FeatureIndexT F>
 Task<F>* MySafeDowncast(TaskInterface* task) {
-  // CHECK(task != nullptr);
-  // CHECK_EQ(task->FeaturesSize(), F);
   return dynamic_cast<Task<F>*>(task);
 }
 template <FeatureIndexT F>
 const Task<F>* MySafeDowncast(const TaskInterface* task) {
-  // CHECK(task != nullptr);
-  // CHECK_EQ(task->FeaturesSize(), F);
   return dynamic_cast<const Task<F>*>(task);
 }
 template <FeatureIndexT F>
@@ -69,30 +65,13 @@ std::unique_ptr<Task<F>> MySafeDowncast(
   return std::unique_ptr<Task<F>>(MySafeDowncast<F>(task.release()));
 }
 
-// double mymean(const std::vector<double> v) {
-//   double sum = std::accumulate(v.begin(), v.end(), 0.0);
-//   double mean = sum / v.size();
-//   return mean;
-// }
-
-// double mystdev(const std::vector<double> v) {
-//   double sum = std::accumulate(v.begin(), v.end(), 0.0);
-//   double mean = sum / v.size();
-
-//   std::vector<double> diff(v.size());
-//   std::transform(v.begin(), v.end(), diff.begin(), [mean](double x) { return x - mean; });
-//   double sq_sum = std::inner_product(diff.begin(), diff.end(), diff.begin(), 0.0);
-//   double stdev = std::sqrt(sq_sum / v.size());
-//   return stdev;
-// }
-
 template <FeatureIndexT F>
 class Executor {
  public:
   // Constructs a standard executor. Uses a clean memory and automatically
   // executes the setup component function. All arguments are stored by
   // reference, so they must out-live the Executor instance.
-  /// James:: we don't add new operator here because new operator need iterator to loop over data samples.
+  /// we don't add new operator here because new operator need iterator to loop over data samples.
   Executor(const Algorithm& algorithm, const Task<F>& dataset,
            // Includes the examples in all the training epochs.
            IntegerT num_all_train_examples, IntegerT num_valid_examples,
@@ -133,9 +112,6 @@ class Executor {
   FRIEND_TEST(ExecutorTest, ValidationDoesNotSeeLabels);
   FRIEND_TEST(ExecutorTest, TrainOptimizationsAreCorrect);
   FRIEND_TEST(ExecutorTest, MultiEpochTrainingWorksCorrectly);
-
-  // // myexecute to convert task into Task<F> type
-  // Task<F> MyExecute(const TaskInterface& task);
 
   // Performs training until the end. Returns whether successful. If not, it
   // means training stopped early.
@@ -222,69 +198,6 @@ inline FeatureIndexT Argmax(const Vector<F>& input);
 
 }  // namespace internal
 
-// template <FeatureIndexT F>
-// struct DowncastStruct {
-// // Downcasts a TaskInterface. Crashes if the downcast would have been
-// // incorrect.
-//   // template <FeatureIndexT F>
-//   Task<F>* MySafeDowncast(TaskInterface* task) {
-//     CHECK(task != nullptr);
-//     CHECK_EQ(task->FeaturesSize(), F);
-//     return dynamic_cast<Task<F>*>(task);
-//   }
-//   // template <FeatureIndexT F>
-//   const Task<F>* MySafeDowncast(const TaskInterface* task) {
-//     CHECK(task != nullptr);
-//     CHECK_EQ(task->FeaturesSize(), F);
-//     return dynamic_cast<const Task<F>*>(task);
-//   }
-//   // template <FeatureIndexT F>
-//   std::unique_ptr<Task<F>> MySafeDowncast(
-//       std::unique_ptr<TaskInterface> task) {
-//     CHECK(task != nullptr);
-//     return std::unique_ptr<Task<F>>(MySafeDowncast<F>(task.release()));
-//   }
-// };
-
-// template <FeatureIndexT F>
-// struct MyExecuteStruct {
-//   const Task<F>& MyExecute(const TaskInterface& task) {
-//     switch (task.FeaturesSize()) {
-//       case 2: {
-//         const Task<2>& downcasted_task = *MySafeDowncast<2>(&task); 
-//         // const Task<2>& downcasted_task = *MySafeDowncast<2>(&task); // James: down is how to change the task/dataset? Later in execute task<F> is treated as dataset
-//         return downcasted_task;
-//       }
-//       case 4: {
-//         const Task<4>& downcasted_task = *MySafeDowncast<4>(&task);
-//         return downcasted_task;
-//       }
-//       case 8: {
-//         const Task<8>& downcasted_task = *MySafeDowncast<8>(&task);
-//         return downcasted_task;
-//       }
-//       case 10: {
-//         const Task<10>& downcasted_task = *MySafeDowncast<10>(&task);
-//         return downcasted_task;
-//       }
-//       case 13: {
-//         const Task<13>& downcasted_task = *MySafeDowncast<13>(&task);
-//         return downcasted_task;
-//       }
-//       case 16: {
-//         const Task<16>& downcasted_task = *MySafeDowncast<16>(&task);
-//         return downcasted_task;
-//       }
-//       case 32: {
-//         const Task<32>& downcasted_task = *MySafeDowncast<32>(&task);
-//         return downcasted_task;
-//       }
-//       default:
-//         LOG(FATAL) << "Unsupported features size." << endl;
-//     }
-//   }
-// };
-
 ////////////////////////////////////////////////////////////////////////////////
 // Scalar arithmetic-related instructions.
 ////////////////////////////////////////////////////////////////////////////////
@@ -295,9 +208,6 @@ inline void ExecuteScalarSumOp(
     Memory<F>* memory, const Matrix<F> features) {
   memory->scalar_[instruction.out_] =
       memory->scalar_[instruction.in1_] + memory->scalar_[instruction.in2_];
-    // cout << " scalar add in1 " << memory->scalar_[instruction.in1_] << endl;
-    // cout << " scalar add in2 " << memory->scalar_[instruction.in2_] << endl;
-    // cout << " scalar add out " << memory->scalar_[instruction.out_] << endl;
 }
 
 template<FeatureIndexT F>
@@ -306,9 +216,6 @@ inline void ExecuteScalarDiffOp(
     Memory<F>* memory, const Matrix<F> features) {
   memory->scalar_[instruction.out_] =
       memory->scalar_[instruction.in1_] - memory->scalar_[instruction.in2_];
-    // cout << " scalar diff in1 " << memory->scalar_[instruction.in1_] << endl;
-    // cout << " scalar diff in2 " << memory->scalar_[instruction.in2_] << endl;
-    // cout << " scalar diff out " << memory->scalar_[instruction.out_] << endl;
 }
 
 template<FeatureIndexT F>
@@ -332,12 +239,6 @@ inline void ExecuteScalarDivisionOp(
       memory->scalar_[instruction.in1_] /
       memory->scalar_[instruction.in2_];
   }
-
-      // if (memory->scalar_[instruction.in1_] == 0 && memory->scalar_[instruction.in2_] == 0.001) {
-      //   cout << " scalar division in1 " << memory->scalar_[instruction.in1_] << endl;
-      //   cout << " scalar division in2 " << memory->scalar_[instruction.in2_] << endl;
-      //   cout << " scalar division out " << memory->scalar_[instruction.out_] << endl;
-      // }
 }
 
 template<FeatureIndexT F>
@@ -698,9 +599,6 @@ inline void ExecuteVectorInnerProductOp(
   memory->scalar_[instruction.out_] =
       memory->vector_[instruction.in1_].dot(
           memory->vector_[instruction.in2_]);
-  // cout << " dot product out = " << memory->scalar_[instruction.out_] << endl;
-  // cout << " dot product in1 = " << memory->vector_[instruction.in1_] << endl;
-  // cout << " dot product in2 = " << memory->vector_[instruction.in2_] << endl;
 }
 
 template<FeatureIndexT F>
@@ -931,44 +829,10 @@ inline void ExecuteMatrixUniformSetOp(
 // My instructions.
 ////////////////////////////////////////////////////////////////////////////////
 
-// template<FeatureIndexT F>
-// inline void ExecuteMatrixScalarRankOp(
-//     const Instruction& instruction, RandomGenerator* rand_gen,
-//     Memory<F>* memory, const Matrix<F> features_it) {
-//     // vector<double> vector_for_rank;
-//     // vector_for_rank.resize(tasks_.size());
-//     // cout << "code is here??????" << endl;
-//     double features_element = features_it(
-//       FloatToIndex(instruction.GetFloatData0(), F),
-//       FloatToIndex(instruction.GetFloatData1(), F));
-//     // cout << "FloatToIndex(instruction.GetFloatData0(), F):" << FloatToIndex(instruction.GetFloatData0(), F) << endl;
-//     // cout << "FloatToIndex(instruction.GetFloatData1(), F):" << FloatToIndex(instruction.GetFloatData1(), F) << endl;
-//     // cout << "features_element:" << features_element << endl;
-//     double out = 0.0;
-
-//     // loop over tasks to get the element of features matrix
-//     for (Matrix<F> rank_feature : rank_features) {
-//       // cout << "step:" << step << endl;
-//       // cout << "step_it:" << step_it << endl;
-//       double features_it_compare = rank_feature(
-//         FloatToIndex(instruction.GetFloatData0(), F),
-//         FloatToIndex(instruction.GetFloatData1(), F));
-//       // cout << "features_element:" << features_element << endl;
-//       // cout << "features_it_compare:" << features_it_compare << endl;
-//       if (features_element > features_it_compare) ++out;       
-//     }
-//     // cout << "rank:" << out/10 << endl;
-//     memory->scalar_[instruction.out_] = out/10;
-// }
-
 template<FeatureIndexT F>
 inline void ExecuteGetScalarOp(
     const Instruction& instruction, RandomGenerator* rand_gen,
     Memory<F>* memory, const Matrix<F> features_it) {
-    // vector<double> vector_for_rank;
-    // vector_for_rank.resize(tasks_.size());
-    // cout << "FloatToIndex(instruction.GetFloatData0(), F)" << FloatToIndex(instruction.GetFloatData0(), F) << endl;
-    // cout << "FloatToIndex(instruction.GetFloatData1(), F)" << FloatToIndex(instruction.GetFloatData1(), F) << endl;
     double features_element = features_it(
       FloatToIndex(instruction.GetFloatData0(), F),
       FloatToIndex(instruction.GetFloatData1(), F));
@@ -1035,9 +899,6 @@ inline void ExecuteCorrelationOp(
   const Vector<F>& valuesA = memory->vector_[instruction.in1_];
   const Vector<F>& valuesB = memory->vector_[instruction.in2_];
 
-  // ::Eigen::VectorXd valuesA = valuesAvector(::Eigen::seq(0, FloatToIndex(instruction.GetFloatData0(), F)));  
-  // ::Eigen::VectorXd valuesB = valuesBvector(::Eigen::seq(0, FloatToIndex(instruction.GetFloatData0(), F)));
-
   const double meanA = valuesA.mean();
   const double stdevA =
       sqrt((valuesA.array() * valuesA.array()).sum() /
@@ -1051,16 +912,9 @@ inline void ExecuteCorrelationOp(
   if (isnan(stdevA) || isnan(stdevB) || stdevA == 0 || stdevB == 0 || meanA == 0 || meanB == 0 || (valuesA.size() - 1) == 0) {
     memory->scalar_[instruction.out_] = 0;
   } else {    
-    // std::cout << "is code run here???? " << std::endl;
     memory->scalar_[instruction.out_] = ((((valuesA).array() - meanA) / stdevA * ((valuesB).array() - meanB) / stdevB).sum())/ (valuesA.size() - 1);
   }
   if (isnan(memory->scalar_[instruction.out_])) {
-    for (IntegerT for_compare = 0; for_compare < F; ++for_compare) {
-      // std::cout << "valuesA(for_compare) " << valuesA(for_compare) << std::endl;
-      // std::cout << "valuesB(for_compare)? " << valuesB(for_compare) << std::endl;
-
-    }
-    // std::cout << "(valuesA.array() * valuesA.array()).sum() / static_cast<double>(F) - meanA * meanA " << ((valuesA.array() * valuesA.array()).sum() / static_cast<double>(F) - meanA * meanA) << std::endl;
     CHECK_EQ(stdevA, 0);
     CHECK(!isnan(memory->scalar_[instruction.out_]));
   }
@@ -1074,9 +928,6 @@ inline void ExecuteCovarianceOp(
   const Vector<F>& valuesA = memory->vector_[instruction.in1_];
   const Vector<F>& valuesB = memory->vector_[instruction.in2_];
 
-  // ::Eigen::VectorXd valuesA = valuesAvector(::Eigen::seq(0, FloatToIndex(instruction.GetFloatData0(), F)));  
-  // ::Eigen::VectorXd valuesB = valuesBvector(::Eigen::seq(0, FloatToIndex(instruction.GetFloatData0(), F)));
-
   const double meanA = valuesA.mean();
   const double stdevA =
       sqrt((valuesA.array() * valuesA.array()).sum() /
@@ -1087,25 +938,13 @@ inline void ExecuteCovarianceOp(
       sqrt((valuesB.array() * valuesB.array()).sum() /
            static_cast<double>(F) -
            meanB * meanB);    
-  for (std::vector<double>::size_type i = 0; i < valuesA.size(); ++i) {
-    // std::cout << "valuesA[" << i << "]: " << valuesA[i] << endl;
-  }
-  for (std::vector<double>::size_type i = 0; i < valuesB.size(); ++i) {
-    // std::cout << "valuesB[" << i << "]: " << valuesB[i] << endl;
-  }
-    // for (std::vector<double>::size_type j = 0; j < prices->size(); j++) {
-    //   vector<double>& vecRef = *prices;
-    //   std::cout << "prices[j] " << vecRef[j] << std::endl;
-    //   if (vecRef[j] > 10000.0) CHECK(prices->size() == 1);
-    // }
+
   if (isnan(stdevA) || isnan(stdevB) || stdevA == 0 || stdevB == 0 || meanA == 0 || meanB == 0 || (valuesA.size() - 1) == 0) {
     memory->scalar_[instruction.out_] = 0;
   } else {    
-    // std::cout << "is code run here???? " << std::endl;
     memory->scalar_[instruction.out_] = ((((valuesA).array() - meanA) * ((valuesB).array() - meanB)).sum())/ (valuesA.size() - 1);
   }
   if (isnan(memory->scalar_[instruction.out_])) {
-  // if (meanA > 0.5 && meanB > 0.5) {
     for (IntegerT for_compare = 0; for_compare < valuesA.size(); ++for_compare) {
       std::cout << "debug valuesA(for_compare) " << valuesA(for_compare) << std::endl;
       std::cout << "debug valuesB(for_compare)? " << valuesB(for_compare) << std::endl;
@@ -1278,10 +1117,8 @@ template<FeatureIndexT F>
 inline void ExecuteMyInstruction(
     const Instruction& instruction, RandomGenerator* rand_gen,
     Memory<F>* memory, const Matrix<F> features) {
-    // cout << "code is run here?" << endl;
     (*kOpIndexToExecuteFunction<F>[instruction.op_])(
         instruction, rand_gen, memory, features);
-    // cout << "mymemory_.scalar_[instruction->out_] aftter myinstrction!" << memory->scalar_[instruction.out_] << endl;
 }
 
 template <FeatureIndexT F>
@@ -1308,10 +1145,6 @@ struct PredictionGetter {
 template <FeatureIndexT F>
 struct ErrorComputer {
   inline static double Compute(const Memory<F>& memory, const Scalar& label) {
-    // if (isnan(std::abs(label - memory.scalar_[kPredictionsScalarAddress]))) {
-    //   cout << "label is:" << label << endl;
-    //   cout << "memory.scalar_[kPredictionsScalarAddress]" << memory.scalar_[kPredictionsScalarAddress] << endl;
-    // }
     return std::abs(label - memory.scalar_[kPredictionsScalarAddress]);
   }
 };
@@ -1319,12 +1152,6 @@ struct ErrorComputer {
 template <FeatureIndexT F>
 struct ProbabilityConverter {
   inline static void Convert(Memory<F>* memory) {
-    //James: see my other comments for checking nans
-    // CHECK(!(isnan(Sigmoid(memory->scalar_[kPredictionsScalarAddress]))));
-    // if (isnan(Sigmoid(memory->scalar_[kPredictionsScalarAddress]))) {
-    //   cout << "memory->scalar_[kPredictionsScalarAddress]" << memory->scalar_[kPredictionsScalarAddress] << endl;
-    //   cout << "Sigmoid(memory->scalar_[kPredictionsScalarAddress])" << Sigmoid(memory->scalar_[kPredictionsScalarAddress]) << endl;
-    // }
     memory->scalar_[kPredictionsScalarAddress] =
         2 * Sigmoid(memory->scalar_[kPredictionsScalarAddress]) - 1; // james: because return ranges from 1 to -1
   }
@@ -1381,10 +1208,8 @@ double Executor<F>::Execute(std::vector<double>* valid_preds,
             std::min(num_examples_per_epoch, num_remaining),
             train_errors, &train_it, tasks_rank, this_round, task_index, num_stock_rank, num_TS_rank, num_of_stocks_to_approximate_rank, useful_list)) {
       if (num_remaining == num_all_train_examples) {
-        // cout << " here return kMinFitness " << endl;
         return kMinFitness;
       } else {
-        // cout << " break " << endl;
         break;
       }
     } 
@@ -1396,14 +1221,6 @@ double Executor<F>::Execute(std::vector<double>* valid_preds,
     
     const double current_fitness = Validate(valid_errors, valid_preds, price_diff, tasks_rank, this_round, task_index, num_stock_rank, num_TS_rank, num_of_stocks_to_approximate_rank, useful_list);
     
-    // for (std::vector<double>::size_type j = 0; j < prices->size(); j++) {
-    //   vector<double>& vecRef = *prices;
-    //   std::cout << "prices[j] " << vecRef[j] << std::endl;
-    //   if (vecRef[j] > 10000.0) CHECK(prices->size() == 1);
-    // }
-    // cout << "code run here 7 " << endl;
-    // James: add below print to find out the source cause of 0 size preds vector.
-    // cout << " valid_preds_in_Validate_Function " << valid_preds->size() << endl;
     best_fitness = std::max(current_fitness, best_fitness);
     // Only save the errors of the first epoch.
     if (train_errors != nullptr) {
@@ -1466,265 +1283,11 @@ template <FeatureIndexT F>
 bool Executor<F>::CheckFeature(Matrix<F> features) {
       for (IntegerT i = 0; i < F; ++i) {
         for (IntegerT j = 0; j < F; ++j) {
-        // cout << "features[i]" << features[i] << endl;
-          // std::cout << "features[" << i << "][" << j << "]: " << features(i ,j) << std::endl;
           if (std::abs((features(i ,j))) == 1234) return true;
       } 
     }
     return false;
 }
-
-// /// james: check if previous instruction.out_ has the op previous_rank's instruction.in1_
-// template <FeatureIndexT F>
-// bool Executor<F>::CheckHasIn(const Algorithm* algorithm, IntegerT ins_count, IntegerT in1) {
-//   // cout << "check algo" << endl;
-//   bool return_type;
-//   vector<double> list_int_op = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,21,27,34,44,47,50,51,54,55,56,59,62,65,66,67,71,72,74,75};
-//   for (const std::shared_ptr<const Instruction>& myinstruction :
-//    algorithm->predict_) {     
-//       // cout << "check instruction: " << myinstruction->ToString() << endl;
-//     bool found = (std::find(list_int_op.begin(), list_int_op.end(), myinstruction->op_) != list_int_op.end());
-//       if (myinstruction->out_ == in1 && found) {
-//         // cout << "myinstruction->out_" << myinstruction->out_ << endl;
-//         // cout << "in1" << in1 << endl;
-//         // cout << "ins_count_rank" << ins_count_rank << endl;
-//         // cout << "ins_count" << ins_count << endl;
-
-//         return_type = true;
-//         return return_type;
-//       } else return_type = false;
-//    }
-
-//   for (const std::shared_ptr<const Instruction>& myinstruction :
-//    algorithm->learn_) {     
-//       // cout << "check instruction: " << myinstruction->ToString() << endl;
-//     bool found = (std::find(list_int_op.begin(), list_int_op.end(), myinstruction->op_) != list_int_op.end());
-//       if (myinstruction->out_ == in1 && found) {
-//         // cout << "myinstruction->out_" << myinstruction->out_ << endl;
-//         // cout << "in1" << in1 << endl;
-//         // cout << "ins_count_rank" << ins_count_rank << endl;
-//         // cout << "ins_count" << ins_count << endl;
-
-//         return_type = true;
-//         return return_type;
-//       } else return_type = false;
-//    }
-
-//   return return_type;
-// }
-
-// /// james: check if previous instruction.out_ has the op previous_rank's instruction.in1_
-// template <FeatureIndexT F>
-// bool Executor<F>::CheckHasOut(const Algorithm* algorithm, IntegerT ins_count, IntegerT out, IntegerT check_out, IntegerT check_type) {
-//   // cout << "check algo" << endl;
-//   IntegerT further_out;
-//   bool return_type;
-//   vector<double> list_int_op = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,18,19,29,44,47,65,66,72,73,75};
-//   vector<double> list_int_op2 = {1,2,3,4,44,47};
-//   vector<double> list_int_op_out = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,21,27,34,44,47,50,51,54,55,56,59,62,65,66,67,71,72,74,75};
-
-//   vector<double> list_vec_op = {16,20,22,23,24,25,26,27,28,32,33,45,48,50,54,71,74};
-//   vector<double> list_vec_op2 = {18,23,24,25,26,27,28,31,45,48,71,74};
-//   vector<double> list_vec_op_out = {16,18,19,20,22,23,24,25,26,31,35,36,45,48,52,53,57,60,63,68,69,73};
-
-//   vector<double> list_mat_op = {17,30,31,34,35,36,37,38,39,40,41,42,43,46,49,51,52,53,55};
-//   vector<double> list_mat_op2 = {29,39,40,41,42,43,46,49};
-//   vector<double> list_mat_op_out = {17,28,29,30,32,33,37,38,39,40,41,42,43,46,49,58,61,64};
-
-//   for (const std::shared_ptr<const Instruction>& myinstruction :
-//    algorithm->predict_) {     
-//       // cout << "check instruction: " << myinstruction->ToString() << endl;
-//     bool found;
-//     bool found2;
-//     switch (ins_count) {
-//       case 0: {
-//         found = (std::find(list_int_op.begin(), list_int_op.end(), myinstruction->op_) != list_int_op.end());
-//         found2 = (std::find(list_int_op2.begin(), list_int_op2.end(), myinstruction->op_) != list_int_op2.end());
-//         break;        
-//       }
-//       case 1: {
-//         found = (std::find(list_vec_op.begin(), list_vec_op.end(), myinstruction->op_) != list_vec_op.end());
-//         found2 = (std::find(list_vec_op2.begin(), list_vec_op2.end(), myinstruction->op_) != list_vec_op2.end());    
-//         break;        
-//       }
-//       case 2: {
-//         found = (std::find(list_mat_op.begin(), list_mat_op.end(), myinstruction->op_) != list_mat_op.end());
-//         found2 = (std::find(list_mat_op2.begin(), list_mat_op2.end(), myinstruction->op_) != list_mat_op2.end());     
-//         break;      
-//       }
-//     }
-
-//       if ((myinstruction->in1_ == out && found) || (myinstruction->in2_ == out && found2)) {
-//         // cout << "myinstruction->out_" << myinstruction->out_ << endl;
-//         // cout << "in1" << in1 << endl;
-//         // cout << "ins_count_rank" << ins_count_rank << endl;
-//         // cout << "ins_count" << ins_count << endl;
-//         bool found3 = (std::find(list_int_op_out.begin(), list_int_op_out.end(), myinstruction->op_) != list_int_op_out.end());
-//         bool found3_vec = (std::find(list_vec_op_out.begin(), list_vec_op_out.end(), myinstruction->op_) != list_vec_op_out.end());
-//         bool found3_mat = (std::find(list_mat_op_out.begin(), list_mat_op_out.end(), myinstruction->op_) != list_mat_op_out.end());
-
-//         further_out = myinstruction->out_;
-//         if (further_out == 1 && found3) return true;
-//         else if (found3) {
-//           if (0 == check_type && check_out == further_out) return false;
-//           return_type = CheckHasOut(algorithm, 0, further_out, check_out, check_type);
-//         }
-//         else if (found3_vec) {
-//           if (1 == check_type && check_out == further_out) return false;
-//           return_type = CheckHasOut(algorithm, 1, further_out, check_out, check_type);
-//         }
-//         else if (found3_mat) {
-//           if (2 == check_type && check_out == further_out) return false;
-//           return_type = CheckHasOut(algorithm, 2, further_out, check_out, check_type);
-//         }
-
-//         if (return_type == true) return return_type;
-//       } else return_type = false;
-//    }
-
-//   for (const std::shared_ptr<const Instruction>& myinstruction :
-//    algorithm->learn_) {     
-//     bool found;
-//     bool found2;
-//     switch (ins_count) {
-//       case 0: {
-//         found = (std::find(list_int_op.begin(), list_int_op.end(), myinstruction->op_) != list_int_op.end());
-//         found2 = (std::find(list_int_op2.begin(), list_int_op2.end(), myinstruction->op_) != list_int_op2.end());
-//         break;        
-//       }
-//       case 1: {
-//         found = (std::find(list_vec_op.begin(), list_vec_op.end(), myinstruction->op_) != list_vec_op.end());
-//         found2 = (std::find(list_vec_op2.begin(), list_vec_op2.end(), myinstruction->op_) != list_vec_op2.end());    
-//         break;        
-//       }
-//       case 2: {
-//         found = (std::find(list_mat_op.begin(), list_mat_op.end(), myinstruction->op_) != list_mat_op.end());
-//         found2 = (std::find(list_mat_op2.begin(), list_mat_op2.end(), myinstruction->op_) != list_mat_op2.end());     
-//         break;      
-//       }
-//     }
-
-//       if ((myinstruction->in1_ == out && found) || (myinstruction->in2_ == out && found2)) {
-//         // cout << "myinstruction->out_" << myinstruction->out_ << endl;
-//         // cout << "in1" << in1 << endl;
-//         // cout << "ins_count_rank" << ins_count_rank << endl;
-//         // cout << "ins_count" << ins_count << endl;
-//         bool found3 = (std::find(list_int_op_out.begin(), list_int_op_out.end(), myinstruction->op_) != list_int_op_out.end());
-//         bool found3_vec = (std::find(list_vec_op_out.begin(), list_vec_op_out.end(), myinstruction->op_) != list_vec_op_out.end());
-//         bool found3_mat = (std::find(list_mat_op_out.begin(), list_mat_op_out.end(), myinstruction->op_) != list_mat_op_out.end());
-
-//         further_out = myinstruction->out_;
-//         if (further_out == 1 && found3) return true;
-//         else if (found3) {
-//           if (0 == check_type && check_out == further_out) return false;
-//           return_type = CheckHasOut(algorithm, 0, further_out, check_out, check_type);
-//         }
-//         else if (found3_vec) {
-//           if (1 == check_type && check_out == further_out) return false;
-//           return_type = CheckHasOut(algorithm, 1, further_out, check_out, check_type);
-//         }
-//         else if (found3_mat) {
-//           if (2 == check_type && check_out == further_out) return false;
-//           return_type = CheckHasOut(algorithm, 2, further_out, check_out, check_type);
-//         }
-
-//         if (return_type == true) return return_type;
-//       } else return_type = false;
-//    }
-//   return return_type;
-// }
-// We don't care that this function is inline. We just want to keep it here,
-// next to TrainOptImpl (below).
-// template <FeatureIndexT F>
-// double Executor<F>::RecursiveRank(IntegerT ins_count, IntegerT in1, Memory<F>* memory, Memory<F>* mymemory) { /// james: should I write , Memory<F>* memory_, Memory<F>* mymemory_???
-
-//   double out = 0.0;
-//   double count = 0.0;
-//   // loop over tasks to get the in1 number of operation 66
-//   // sample一些stocks tasks来增加速度，或者出现rank直接算前两个省略后面的rank op！！！
-  
-//   // if (task_count == 1) {tasks_results_for_compare.clear();}
-//   /// james: for every new task for ranking wipe memory and run setup part again
-
-
-//   // cout << "init mymemory_.scalar_[instruction->in1_]" << mymemory_.scalar_[instruction->in1_] << endl;
-//   // Task<F> down_task = MyExecuteStruct<F>::MyExecute(*task);
-//   // Task<F> down_task = MySafeDowncast<F>(task_star);
-//   for (Matrix<F> rank_feature : rank_features) {
-//   ++count;
-//   // cout << "count" << count << endl;
-//     mymemory->Wipe();
-//     for (const std::shared_ptr<const Instruction>& instruction :
-//          algorithm_.setup_) {
-//       ExecuteInstruction(*instruction, rand_gen_, mymemory);
-//     }   
-//     // Run predict component function for this example.
-//     mymemory->matrix_[kFeaturesMatrixAddress] = rank_feature;
-
-//     IntegerT ins_count_rank = 0;
-//     for (const std::shared_ptr<const Instruction>& myinstruction :
-//       algorithm_.predict_) {  
-//       // cout << "ins_count_rank" << ins_count_rank << endl;
-//       // cout << "ins_count" << ins_count << endl;
-//       // cout << "myinstruction->ToString(): " << myinstruction->ToString() << endl;
-//       /// check if the instruction reach rank op inputed into the function in the main loop
-//       if(ins_count_rank != ins_count) { /// only allow rank of scalar number that is calculated before rank operation and it's on the left hand side of equation otherwise encounter loop over loop...
-//         // if (myinstruction->op_ == 66 || myinstruction->op_ == 65) {
-//         //   ++ins_count_rank;
-//         //   continue;
-//         // }
-//         if (myinstruction->op_ == 66) {
-//           // cout << "num_rank_op_count" << num_rank_op_count << endl;
-//               ///  count when will reach the op count at main loop            
-
-
-//           // cout << "instruction: " << instruction->ToString() << endl;
-//           if(!CheckHasIn(&algorithm_, ins_count_rank, myinstruction->in1_) || isnan(mymemory->scalar_[myinstruction->in1_])) {
-//           // if(!CheckHasIn(&algorithm_, ins_count, instruction->in1_) || isnan(memory_.scalar_[instruction->in1_])) {
-//             ++ins_count_rank;
-//             continue;
-//           } 
-
-//           Memory<F> mymymemory;
-
-//           double outrank = RecursiveRank(ins_count_rank, myinstruction->in1_, rank_features, mymemory, &mymymemory);
-     
-//           // cout << "through recursive inside out/20:" << outrank << endl;
-//           mymemory->scalar_[myinstruction->out_] = outrank;                  
-//           // cout << "mymemory->scalar_[myinstruction->out_]:" << mymemory->scalar_[myinstruction->out_] << endl;
-//           // cout << "train noop rank:" << outrank << endl;
-//           // cout << "myinstruction->ToString(): " << myinstruction->ToString() << endl;
-//           ExecuteMyInstruction(*myinstruction, rand_gen_, mymemory, rank_features, mymemory->matrix_[kFeaturesMatrixAddress]); 
-//           ++ins_count_rank;        
-//         } else {
-//           ++ins_count_rank;                 
-         
-//           // cout << "ins_count_rank : " << ins_count_rank << endl;
-//           // cout << "mymemory_.scalar_[myinstruction->in1_]!" << mymemory->scalar_[myinstruction->in1_] << endl;
-//           // cout << "myinstruction->ToString(): " << myinstruction->ToString() << endl;
-//           ExecuteMyInstruction(*myinstruction, rand_gen_, mymemory, rank_features, mymemory->matrix_[kFeaturesMatrixAddress]);
-//           // cout << "mymemory_.scalar_[myinstruction->out_]!" << mymemory->scalar_[myinstruction->out_] << endl;
-//           // if (init_in1 != mymemory_.scalar_[myinstruction->in1_]) {
-//           //   cout << "mymemory_.scalar_[myinstruction->in1_] is changed!" << mymemory_.scalar_[myinstruction->in1_] << endl;
-//           //   cout << "instruction that makes in1 to change: " << myinstruction->ToString() << endl;
-//           // }
-
-//         }
-//       } else {
-//         CHECK(myinstruction->op_ == 66);
-//         // cout << "in1" << in1 << endl;
-//         // cout << "myinstruction->in1_" << myinstruction->in1_ << endl;
-//         CHECK(in1 == myinstruction->in1_);
-//         // cout << "inside mymemory_.scalar_[myinstruction->in1_]" << mymemory->scalar_[myinstruction->in1_] << endl;
-//         // cout << "inside memory_.scalar_[instruction->in1_]" << memory->scalar_[in1] << endl;
-//         // cout << "out: " << out << endl;
-//         if (mymemory->scalar_[myinstruction->in1_] < memory->scalar_[in1]) ++out;
-//         break;                  
-//       }
-//     }        
-//   }
-//    return out/(10);
-// }
 
 // We don't care that this function is inline. We just want to keep it here,
 // next to TrainOptImpl (below).
@@ -1735,19 +1298,13 @@ inline bool Executor<F>::TrainNoOptImpl(const IntegerT max_steps,
                                         std::vector<std::vector<std::vector<double>>>* tasks_rank,
                                         IntegerT this_round,
                                         IntegerT task_index, IntegerT* num_stock_rank, IntegerT* num_TS_rank, const IntegerT num_of_stocks_to_approximate_rank, std::vector<IntegerT> *useful_list) {
-  // cout << "code run here 1 " << endl;
   if (errors != nullptr) {
     errors->reserve(max_steps);
   }
 
-  // cout << "dataset_.industry_relation_ no op" << dataset_.industry_relation_ << endl;
-  // cout << "current_relation_count no op" << current_relation_count << endl;
-  // cout << "previous_relation no op" << previous_relation << endl;
-  // cout << "current_relation no op" << current_relation << endl;
   vector<double> relatiion_start_list = {0,36,69,74,79,235,237,369,386,387,406,411,452,464,508,524,530,539,543,551,553,570,599,605,616,622,635,643,661,663,670,671,691,700,701,707,718,721,724,726,730,732,734,744,749,757,764,767,775,782,802,805,809,813,816,822,825,830,833,837,843,850,852,860,862,866,869,875,880,882,890,891,896,898,903,904,908,910,915,921,928,940,946,952,954,957,964,965,966,971,975,979,984,992,994,995,997,1000,1003,1004,1005,1007,1008,1009,1010,1012,1014,1018,1020,1021,1022,1024,1025};
 
   if (dataset_.industry_relation_ == current_relation) {
-    // cout << "code run here 15 " << endl;
     ++current_relation_count;
     previous_relation = current_relation; // comparing the real current (dataset_.industry_relation_) with the actual previous (current_relation)
   } else current_relation_count = 0;
@@ -1757,20 +1314,16 @@ inline bool Executor<F>::TrainNoOptImpl(const IntegerT max_steps,
 
   for (IntegerT step = 0; step < max_steps; ++step) {
     num_train_steps_completed_++;
-    // cout << "step: " << step << endl;
     // Run predict component function for this example.
     const Matrix<F>& features = train_it->GetFeatures();
-    // cout << "matrix try value: " << rank_features[0](0.1, 0.1) << endl;
     if (CheckFeature(features)) {
       train_it->Next();
       if (train_it->Done()) {
-            // cout << "code run here 2 " << endl;
         break;  // Reached the end of the dataset.
       }
       continue;
     }
     memory_.matrix_[kFeaturesMatrixAddress] = features;
-    // cout << " features = " << features << endl;
     ZeroLabelAssigner<F>::Assign(&memory_);
 
     // count how many instructions have passed
@@ -1784,31 +1337,23 @@ inline bool Executor<F>::TrainNoOptImpl(const IntegerT max_steps,
 
     IntegerT num_stock_rank_count = 0;
     IntegerT num_TS_rank_count = 0;
-    // IntegerT this_num_TS_rank_count = 0;
 
-    // cout << "code run here 16 " << endl;
-    /// james: don't learn this sample because of rank op not enough data to compare yet
+    /// don't learn this sample because of rank op not enough data to compare yet
     bool if_skip_this_sample = false; 
 
     for (const std::shared_ptr<const Instruction>& instruction :
          algorithm_.predict_) {
-      // cout << "code run here 17 " << endl;
-      // cout << "instruction->string: " <<instruction->ToString() << endl;
-      // cout << "instruction->in1_" << memory_.scalar_[instruction->in1_] << endl;
-      // cout << "instruction->out_" << memory_.scalar_[instruction->out_] << endl;
+
       double out = 0;
 
       if ((*useful_list)[algorithm_.learn_.size() + ins_count] < 1) {
         ++ins_count;
         continue;
       }
-      // cout << "run instruction predict " << instruction->ToString() << endl;
       if (instruction->op_ == 65 || instruction->op_ == 66 || instruction->op_ == 72 || instruction->op_ == 73 || instruction->op_ == 75) {
 
         if (instruction->op_ == 65 || instruction->op_ == 66 || instruction->op_ == 72 || instruction->op_ == 75) {
           if(isnan(memory_.scalar_[instruction->in1_])) {
-            // if(!CheckHasIn(&algorithm_, ins_count, instruction->in1_) || isnan(memory_.scalar_[instruction->in1_])) {
-            // cout << "instruction: " << instruction->ToString() << endl;
             ++ins_count;
             continue;
           }
@@ -1816,8 +1361,6 @@ inline bool Executor<F>::TrainNoOptImpl(const IntegerT max_steps,
           if (instruction->op_ == 72) ++num_TS_rank_count;
         } else if (instruction->op_ == 73) {
           if(isnan(memory_.scalar_[instruction->in1_])) {
-              // if(!CheckHasIn(&algorithm_, ins_count, instruction->in1_) || isnan(memory_.scalar_[instruction->in1_])) {
-              // cout << "instruction: " << instruction->ToString() << endl;
               ++ins_count;
               continue;
             }
@@ -1825,53 +1368,19 @@ inline bool Executor<F>::TrainNoOptImpl(const IntegerT max_steps,
           ++num_TS_rank_count;         
         }
  
-
-      // cout << "(*tasks_rank)[" << num_rank_op << "][" << this_round << "]step[" << step <<  "]: " << "instruction->in1_" << memory_.scalar_[instruction->in1_] << endl;
-
-      // IntegerT length = (*tasks_rank)[num_rank_op][this_round].size();
-      // cout << "length" << length << endl;
-      // IntegerT stock_length = (*tasks_rank)[num_rank_op].size();
-      // cout << "stock_length" << stock_length << endl;
         switch (instruction->op_) {
           case 75: {
-
-
-
-            // cout << "dataset_.industry_relation_ no op" << dataset_.industry_relation_ << endl;
-            // cout << "current_relation_count no op" << current_relation_count << endl;
-            // cout << "previous_relation no op" << previous_relation << endl;
-            // cout << "current_relation no op" << current_relation << endl;
-            /// james: comment off num_stock_rank count because in relation rank, each stock before industry is inevitablely ignored
-            // ++(*num_stock_rank);
-            if (((this_round + 1) > num_stock_rank_count) && num_stock_rank_count > 0) {
-            // if (dataset_.industry_relation_ == previous_relation && current_relation_count > (num_of_stocks_to_start_approximate * (num_rank_op) + (num_of_stocks_to_start_approximate - 1))) {
-              // if (task_index > 149) {
-              //   // cout << "this task: " <<  task_index << endl;
-              //   // cout << "instruction: " << instruction->ToString() << endl;      
-              // }      
+            if (((this_round + 1) > num_stock_rank_count) && num_stock_rank_count > 0) { 
               IntegerT relation_len;
               if (dataset_.industry_relation_ != 112) relation_len = relatiion_start_list[dataset_.industry_relation_ + 1] - relatiion_start_list[dataset_.industry_relation_];
               else relation_len = 1;
               if (relation_len > 5) {
-                // james: allow num_of_stocks_to_start_approximate to enter rank but allow compare to up to num_of_stocks_to_approximate_rank number of stocks
                 for (IntegerT for_compare = relatiion_start_list[dataset_.industry_relation_]; for_compare < relatiion_start_list[dataset_.industry_relation_ + 1]; ++for_compare) {
-                  // cout << "out: " << out << endl;
-                  // cout << "(*tasks_rank)[" << num_rank_op << "][" << for_compare << "][" << step << "]: " << (*tasks_rank)[num_rank_op][for_compare][step] << endl;
                   out+=(*tasks_rank)[num_rank_op][for_compare][step];
-                    // if (task_index > 149) {
-                    //   // cout << "(*tasks_rank)[" << num_rank_op << "][" << for_compare << "][" << step << "]: " << (*tasks_rank)[num_rank_op][for_compare][step] << endl;
-                    //   // cout << "instruction->in1_" << instruction->in1_ << endl;
-                    // }
                 }                
               } else memory_.scalar_[instruction->out_] = 0;
 
-            //           if (task_index > 149) {
-            //   // cout << "out/num_of_stocks_to_approximate_rank" << out/num_of_stocks_to_approximate_rank << endl;
-            // }
-              // out += memory_.scalar_[instruction->in1_];
               memory_.scalar_[instruction->out_] = memory_.scalar_[instruction->in1_] - out/relation_len;
-              // cout << "memory_.scalar_[instruction->out_]: " << memory_.scalar_[instruction->out_] << endl;
-              // cout << "average: " << out/(std::min(num_of_stocks_to_approximate_rank, (current_relation_count - num_of_stocks_to_start_approximate * (num_rank_op))) + 1);
             }
 
             if ((this_round + 1) == num_stock_rank_count) {
@@ -1882,37 +1391,18 @@ inline bool Executor<F>::TrainNoOptImpl(const IntegerT max_steps,
             break;  
           }
           case 65: {
-
-            /// james: comment off num_stock_rank count because in relation rank, each stock before industry is inevitablely ignored
-            // ++(*num_stock_rank);
             if (((this_round + 1) > num_stock_rank_count) && num_stock_rank_count > 0) {
-              // if (task_index > 149) {
-              //   // cout << "this task: " <<  task_index << endl;
-              //   // cout << "instruction: " << instruction->ToString() << endl;      
-              // }      
-
               IntegerT relation_len;
               if (dataset_.industry_relation_ != 112) relation_len = relatiion_start_list[dataset_.industry_relation_ + 1] - relatiion_start_list[dataset_.industry_relation_];
               else relation_len = 1;
               if (relation_len > 5) {
-                // james: allow num_of_stocks_to_start_approximate to enter rank but allow compare to up to num_of_stocks_to_approximate_rank number of stocks
                 for (IntegerT for_compare = relatiion_start_list[dataset_.industry_relation_]; for_compare < relatiion_start_list[dataset_.industry_relation_ + 1]; ++for_compare) {
                   if (memory_.scalar_[instruction->in1_] > (*tasks_rank)[num_rank_op][for_compare][step]) {
-                    // cout << "out: " << out << endl;
-                    // cout << "(*tasks_rank)[" << num_rank_op << "][" << for_compare << "][" << step << "]: " << (*tasks_rank)[num_rank_op][for_compare][step] << endl;
                     ++out;
                   }
-                    
-                    // if (task_index > 149) {
-                    //   // cout << "(*tasks_rank)[" << num_rank_op << "][" << for_compare << "][" << step << "]: " << (*tasks_rank)[num_rank_op][for_compare][step] << endl;
-                    //   // cout << "instruction->in1_" << instruction->in1_ << endl;
-                    // }
                 }
-              //           if (task_index > 149) {
-              //   // cout << "out/num_of_stocks_to_approximate_rank" << out/num_of_stocks_to_approximate_rank << endl;
-              // }
+
                 memory_.scalar_[instruction->out_] = out/relation_len;
-                // cout << "memory_.scalar_[instruction->out_]: " << memory_.scalar_[instruction->out_] << endl;
               } else memory_.scalar_[instruction->out_] = 0;
             }
             // save in1 of current num_rank_op when it can't be read; put behind the previous if because we cannot change what to compare before we compare it after task index of 9. to rule to random substitute a stock
@@ -1926,11 +1416,7 @@ inline bool Executor<F>::TrainNoOptImpl(const IntegerT max_steps,
           case 66: {
             ++(*num_stock_rank);
             
-            if (this_round + 1 > num_stock_rank_count && num_stock_rank_count > 0) {
-              if (task_index > 149) {
-                // cout << "this task: " <<  task_index << endl;
-                // cout << "instruction: " << instruction->ToString() << endl;      
-              }      
+            if (this_round + 1 > num_stock_rank_count && num_stock_rank_count > 0) {   
               for (IntegerT for_compare = 0; for_compare < num_of_stocks_to_approximate_rank; ++for_compare) {
                 if (memory_.scalar_[instruction->in1_] > (*tasks_rank)[num_rank_op][for_compare][step]) {
                   ++out;
@@ -1947,40 +1433,23 @@ inline bool Executor<F>::TrainNoOptImpl(const IntegerT max_steps,
             break;  
           }
           case 73: { 
-            // cout << "code run here case 73" <<  endl;
-
             if ((this_round + 1 > num_stock_rank_count && num_stock_rank_count > 0) && step > (13 * (*num_TS_rank) + 12)) { /// if step is larger then 12, means there are 13 steps before you can compare
-              if (task_index > 149) {
-                // cout << "this task: " <<  task_index << endl;
-                // cout << "instruction: " << instruction->ToString() << endl;      
-              }      
               IntegerT count = 0;
               for (IntegerT for_compare_step = step - 1 ; for_compare_step > (step - 2 - 12); --for_compare_step) { /// limit case is 0 to 12
                 double count_out = 0.0;
                 for (IntegerT for_compare = 0; for_compare < num_of_stocks_to_approximate_rank; ++for_compare) {
-                  /// james: [(task_index - num_of_stocks_to_start_approximate * (num_rank_op)) % num_of_stocks_to_approximate_rank] to get the most recent stock saved row
                   if ((*tasks_rank)[num_rank_op][task_index][for_compare_step] > (*tasks_rank)[num_rank_op][for_compare][for_compare_step]) ++count_out;
-                //   if (task_index > 149) {
-                //   // cout << "(*tasks_rank)[" << num_rank_op << "][" << for_compare << "][" << for_compare_step << "]: " << (*tasks_rank)[num_rank_op][for_compare][for_compare_step] << endl;
-                //   // cout << "(*tasks_rank)[" << num_rank_op << "][" << task_index % num_of_stocks_to_approximate_rank << "][" << for_compare_step << "]: " << (*tasks_rank)[num_rank_op][task_index % num_of_stocks_to_approximate_rank][for_compare_step] << endl;
-                // }
                 }
-              //                 if (task_index > 149) {
-              //   // cout << "count" << count << endl;
-              //   // cout << "count_out/num_of_stocks_to_approximate_rank" << count_out/num_of_stocks_to_approximate_rank << endl;
-              // }
                 memory_.vector_[instruction->out_](count) = count_out/num_of_stocks_to_approximate_rank;
                 ++count;
               }
             }
-
             // save in1 of current num_rank_op when it can't be read; put behind the previous if because we cannot change what to compare before we compare it after task index of 9. to rule to random substitute a stock e.g. -1 < task_index < 10 or 9 < task_index < 20 or  19 < task_index < 30 ... 
             if ((this_round + 1 == num_stock_rank_count) && (13 * ((*num_TS_rank) - 1) + 12) < step) {
               (*tasks_rank)[num_rank_op][task_index][step] = memory_.scalar_[instruction->in1_];
             }
             if (!((this_round + 1 > num_stock_rank_count && num_stock_rank_count > 0) && step > (13 * (*num_TS_rank) + 12))) if_skip_this_sample = true;
 
-            // ++this_num_TS_rank_count;
             ++(*num_stock_rank);
             ++(*num_TS_rank);        
 
@@ -1999,7 +1468,6 @@ inline bool Executor<F>::TrainNoOptImpl(const IntegerT max_steps,
             }
             if (!(step > (13 * (*num_TS_rank) + 12))) if_skip_this_sample = true;
 
-            // ++this_num_TS_rank_count;
             ++(*num_TS_rank);        
 
             break;
@@ -2011,39 +1479,23 @@ inline bool Executor<F>::TrainNoOptImpl(const IntegerT max_steps,
         if (if_skip_this_sample) break;
 
         ++num_rank_op;
-        // cout << "train noop rank:" << out << endl;
         ExecuteMyInstruction(*instruction, rand_gen_, &memory_, features);
-        // if (task_index > 149) {
-        //   cout << "instruction->string: " <<instruction->ToString() << endl;
-        //   cout << "instruction->out_" << memory_.scalar_[instruction->out_] << endl;
-        //   if (instruction->op_ == 66 || instruction->op_ == 72 || instruction->op_ == 73) {
-        //     for (IntegerT step = 0; step < 13; ++step) {
-        //       cout << "memory_.vector_[instruction->out_](step)" << memory_.vector_[instruction->out_](step) << endl;
-        //     }            
-        //   }
-        // }
+
         ++ins_count;            
       } else {
         ExecuteMyInstruction(*instruction, rand_gen_, &memory_, features);
-        // if (task_index > 149) {
-        // cout << "instruction->string: " <<instruction->ToString() << endl;
-        // cout << "instruction->out_" << memory_.scalar_[instruction->out_] << endl;
-        // }
+
         ++ins_count;
       }
     }
 
-    // if (dataset_.eval_type_ == ACCURACY) {
     ProbabilityConverter<F>::Convert(&memory_);
     
-
     // Check whether we should stop early.
     const Scalar& label = train_it->GetLabel();
     if (std::abs(label) == 1234 || if_skip_this_sample) { /// first condition for missing data entry; second one see comments for if_skip_this_sample
-      // cout << "label == 1234" << label << endl;
       train_it->Next();
       if (train_it->Done()) {
-            // cout << "code run here 2 " << endl;
         break;  // Reached the end of the dataset.
       }
       continue;
@@ -2056,15 +1508,8 @@ inline bool Executor<F>::TrainNoOptImpl(const IntegerT max_steps,
       errors->push_back(abs_error);
     }
 
-    // if (task_index == 0 && step < 100) {
-    //   cout << "label" << label << endl;
-    //   cout << "memory.scalar_[kPredictionsScalarAddress]" << memory_.scalar_[kPredictionsScalarAddress] << endl;
-    //   cout << "abs_error " << abs_error << endl;
-    //   cout << "step" << step << endl;
-    // }
     // Run learn component function for this example.
     memory_.matrix_[kFeaturesMatrixAddress] = features;
-    // cout << " features learn component function = " << features << endl;
     LabelAssigner<F>::Assign(label, &memory_);
 
     IntegerT ins_count_learn = 0;
@@ -2074,15 +1519,12 @@ inline bool Executor<F>::TrainNoOptImpl(const IntegerT max_steps,
         ++ins_count_learn;
         continue;
       }
-      // cout << "run instruction" << instruction->ToString() << endl;
       ExecuteMyInstruction(*instruction, rand_gen_, &memory_, features);
       ++ins_count_learn;
     }
-    // cout << "code run here 18 " << endl;
     // Check whether we are done.
     train_it->Next();
     if (train_it->Done()) {
-      // cout << "code run here 2 " << endl;
       break;  // Reached the end of the dataset.
     }
   }
@@ -2094,21 +1536,12 @@ template <size_t max_component_function_size>
 bool Executor<F>::TrainOptImpl(const IntegerT max_steps,
                                std::vector<double>* errors,
                                TaskIterator<F>* train_it, std::vector<std::vector<std::vector<double>>>* tasks_rank, IntegerT this_round, IntegerT task_index, IntegerT* num_stock_rank, IntegerT* num_TS_rank, const IntegerT num_of_stocks_to_approximate_rank, std::vector<IntegerT> *useful_list) {
-  // cout << "code run here 3 " << endl;
   if (errors != nullptr) {
     errors->reserve(max_steps);
   }
 
   vector<double> relatiion_start_list = {0,36,69,74,79,235,237,369,386,387,406,411,452,464,508,524,530,539,543,551,553,570,599,605,616,622,635,643,661,663,670,671,691,700,701,707,718,721,724,726,730,732,734,744,749,757,764,767,775,782,802,805,809,813,816,822,825,830,833,837,843,850,852,860,862,866,869,875,880,882,890,891,896,898,903,904,908,910,915,921,928,940,946,952,954,957,964,965,966,971,975,979,984,992,994,995,997,1000,1003,1004,1005,1007,1008,1009,1010,1012,1014,1018,1020,1021,1022,1024,1025};
 
-  // static IntegerT previous_relation = -1;
-  // static IntegerT current_relation = -1;
-  // static IntegerT current_relation_count;
-
-  // cout << "dataset_.industry_relation_ opt" << dataset_.industry_relation_ << endl;
-  // cout << "current_relation_count opt" << current_relation_count << endl;
-  // cout << "previous_relation opt" << previous_relation << endl;
-  // cout << "current_relation opt" << current_relation << endl;
   if (dataset_.industry_relation_ == current_relation) {
     previous_relation = current_relation; // comparing the real current (dataset_.industry_relation_) with the actual previous (current_relation)
   } else current_relation_count = 0;
@@ -2139,22 +1572,17 @@ bool Executor<F>::TrainOptImpl(const IntegerT max_steps,
 
   for (IntegerT step = 0; step < max_steps; ++step) {
     num_train_steps_completed_++;
-    // cout << " num_train_steps_completed_ " << num_train_steps_completed_ << endl;
     // Run predict component function for this example.
     const Matrix<F>& features = train_it->GetFeatures();
-    // if (features[F-2] == features[F-3] && features[F-3] == features[F-4]) {
-    // cout << " features " << features << endl;  
-    // }
+
     if (CheckFeature(features)) {
       train_it->Next();
       if (train_it->Done()) {
-            // cout << "code run here 4 " << endl;
         break;  // Reached the end of the dataset.
       }
       continue;
     }
     memory_.matrix_[kFeaturesMatrixAddress] = features;
-    // cout << " features = " << features << endl;
     ZeroLabelAssigner<F>::Assign(&memory_);
 
     IntegerT ins_count = 0;
@@ -2167,7 +1595,7 @@ bool Executor<F>::TrainOptImpl(const IntegerT max_steps,
     IntegerT num_stock_rank_count = 0;
     IntegerT num_TS_rank_count = 0;
 
-    bool if_skip_this_sample = false; /// james: don't learn this sample because of rank op not enough data to compare yet
+    bool if_skip_this_sample = false; /// don't learn this sample because of rank op not enough data to compare yet
 
     for (const std::shared_ptr<const Instruction>& instruction :
          algorithm_.predict_) {
@@ -2178,13 +1606,10 @@ bool Executor<F>::TrainOptImpl(const IntegerT max_steps,
         ++ins_count;
         continue;
       }
-      // cout << "run instruction predict " << instruction->ToString() << endl;
       if (instruction->op_ == 65 || instruction->op_ == 66 || instruction->op_ == 72 || instruction->op_ == 73 || instruction->op_ == 75) {
 
         if (instruction->op_ == 65 || instruction->op_ == 66 || instruction->op_ == 72 || instruction->op_ == 75) {
           if(isnan(memory_.scalar_[instruction->in1_])) {
-            // if(!CheckHasIn(&algorithm_, ins_count, instruction->in1_) || isnan(memory_.scalar_[instruction->in1_])) {
-            // cout << "instruction: " << instruction->ToString() << endl;
             ++ins_count;
             continue;
           }
@@ -2192,60 +1617,26 @@ bool Executor<F>::TrainOptImpl(const IntegerT max_steps,
           if (instruction->op_ == 72) ++num_TS_rank_count;
         } else if (instruction->op_ == 73) {
           if(isnan(memory_.scalar_[instruction->in1_])) {
-              // if(!CheckHasIn(&algorithm_, ins_count, instruction->in1_) || isnan(memory_.scalar_[instruction->in1_])) {
-              // cout << "instruction: " << instruction->ToString() << endl;
               ++ins_count;
               continue;
             }
           ++num_stock_rank_count;
           ++num_TS_rank_count;         
         }
-      // cout << "(*tasks_rank)[" << num_rank_op << "][" << this_round << "]step[" << step <<  "]: " << "instruction->in1_" << memory_.scalar_[instruction->in1_] << endl;
 
-      // IntegerT length = (*tasks_rank)[num_rank_op][this_round].size();
-      // cout << "length" << length << endl;
-      // IntegerT stock_length = (*tasks_rank)[num_rank_op].size();
-      // cout << "stock_length" << stock_length << endl;
       switch (instruction->op_) {
         case 75: {
-
-
-
-          // cout << "dataset_.industry_relation_ no op" << dataset_.industry_relation_ << endl;
-          // cout << "current_relation_count no op" << current_relation_count << endl;
-          // cout << "previous_relation no op" << previous_relation << endl;
-          // cout << "current_relation no op" << current_relation << endl;
-          /// james: comment off num_stock_rank count because in relation rank, each stock before industry is inevitablely ignored
-          // ++(*num_stock_rank);
-          if (((this_round + 1) > num_stock_rank_count) && num_stock_rank_count > 0) {
-          // if (dataset_.industry_relation_ == previous_relation && current_relation_count > (num_of_stocks_to_start_approximate * (num_rank_op) + (num_of_stocks_to_start_approximate - 1))) {
-            // if (task_index > 149) {
-            //   // cout << "this task: " <<  task_index << endl;
-            //   // cout << "instruction: " << instruction->ToString() << endl;      
-            // }      
+          if (((this_round + 1) > num_stock_rank_count) && num_stock_rank_count > 0) {    
             IntegerT relation_len;
             if (dataset_.industry_relation_ != 112) relation_len = relatiion_start_list[dataset_.industry_relation_ + 1] - relatiion_start_list[dataset_.industry_relation_];
             else relation_len = 1;
             if (relation_len > 5) {
-              // james: allow num_of_stocks_to_start_approximate to enter rank but allow compare to up to num_of_stocks_to_approximate_rank number of stocks
               for (IntegerT for_compare = relatiion_start_list[dataset_.industry_relation_]; for_compare < relatiion_start_list[dataset_.industry_relation_ + 1]; ++for_compare) {
-                // cout << "out: " << out << endl;
-                // cout << "(*tasks_rank)[" << num_rank_op << "][" << for_compare << "][" << step << "]: " << (*tasks_rank)[num_rank_op][for_compare][step] << endl;
                 out+=(*tasks_rank)[num_rank_op][for_compare][step];
-                  // if (task_index > 149) {
-                  //   // cout << "(*tasks_rank)[" << num_rank_op << "][" << for_compare << "][" << step << "]: " << (*tasks_rank)[num_rank_op][for_compare][step] << endl;
-                  //   // cout << "instruction->in1_" << instruction->in1_ << endl;
-                  // }
               }                
             } else memory_.scalar_[instruction->out_] = 0;
 
-          //           if (task_index > 149) {
-          //   // cout << "out/num_of_stocks_to_approximate_rank" << out/num_of_stocks_to_approximate_rank << endl;
-          // }
-            // out += memory_.scalar_[instruction->in1_];
             memory_.scalar_[instruction->out_] = memory_.scalar_[instruction->in1_] - out/relation_len;
-            // cout << "memory_.scalar_[instruction->out_]: " << memory_.scalar_[instruction->out_] << endl;
-            // cout << "average: " << out/(std::min(num_of_stocks_to_approximate_rank, (current_relation_count - num_of_stocks_to_start_approximate * (num_rank_op))) + 1);
           }
 
           if ((this_round + 1) == num_stock_rank_count) {
@@ -2256,37 +1647,18 @@ bool Executor<F>::TrainOptImpl(const IntegerT max_steps,
           break;  
         }
         case 65: {
-
-          /// james: comment off num_stock_rank count because in relation rank, each stock before industry is inevitablely ignored
-          // ++(*num_stock_rank);
-          if (((this_round + 1) > num_stock_rank_count) && num_stock_rank_count > 0) {
-            // if (task_index > 149) {
-            //   // cout << "this task: " <<  task_index << endl;
-            //   // cout << "instruction: " << instruction->ToString() << endl;      
-            // }      
-
+          if (((this_round + 1) > num_stock_rank_count) && num_stock_rank_count > 0) {  
             IntegerT relation_len;
             if (dataset_.industry_relation_ != 112) relation_len = relatiion_start_list[dataset_.industry_relation_ + 1] - relatiion_start_list[dataset_.industry_relation_];
             else relation_len = 1;
             if (relation_len > 5) {
-              // james: allow num_of_stocks_to_start_approximate to enter rank but allow compare to up to num_of_stocks_to_approximate_rank number of stocks
               for (IntegerT for_compare = relatiion_start_list[dataset_.industry_relation_]; for_compare < relatiion_start_list[dataset_.industry_relation_ + 1]; ++for_compare) {
                 if (memory_.scalar_[instruction->in1_] > (*tasks_rank)[num_rank_op][for_compare][step]) {
-                  // cout << "out: " << out << endl;
-                  // cout << "(*tasks_rank)[" << num_rank_op << "][" << for_compare << "][" << step << "]: " << (*tasks_rank)[num_rank_op][for_compare][step] << endl;
                   ++out;
-                }
-                  
-                  // if (task_index > 149) {
-                  //   // cout << "(*tasks_rank)[" << num_rank_op << "][" << for_compare << "][" << step << "]: " << (*tasks_rank)[num_rank_op][for_compare][step] << endl;
-                  //   // cout << "instruction->in1_" << instruction->in1_ << endl;
-                  // }
+                }                
               }
-            //           if (task_index > 149) {
-            //   // cout << "out/num_of_stocks_to_approximate_rank" << out/num_of_stocks_to_approximate_rank << endl;
-            // }
+
               memory_.scalar_[instruction->out_] = out/relation_len;
-              // cout << "memory_.scalar_[instruction->out_]: " << memory_.scalar_[instruction->out_] << endl;
             } else memory_.scalar_[instruction->out_] = 0;
           }
           // save in1 of current num_rank_op when it can't be read; put behind the previous if because we cannot change what to compare before we compare it after task index of 9. to rule to random substitute a stock
@@ -2301,10 +1673,7 @@ bool Executor<F>::TrainOptImpl(const IntegerT max_steps,
           ++(*num_stock_rank);
           
           if (this_round + 1 > num_stock_rank_count && num_stock_rank_count > 0) {
-            if (task_index > 149) {
-              // cout << "this task: " <<  task_index << endl;
-              // cout << "instruction: " << instruction->ToString() << endl;      
-            }      
+     
             for (IntegerT for_compare = 0; for_compare < num_of_stocks_to_approximate_rank; ++for_compare) {
               if (memory_.scalar_[instruction->in1_] > (*tasks_rank)[num_rank_op][for_compare][step]) {
                 ++out;
@@ -2312,7 +1681,6 @@ bool Executor<F>::TrainOptImpl(const IntegerT max_steps,
 
             }
             memory_.scalar_[instruction->out_] = out/(num_of_stocks_to_approximate_rank);
-            
           }
           // save in1 of current num_rank_op when it can't be read; put behind the previous if because we cannot change what to compare before we compare it after task index of 9. to rule to random substitute a stock
           if (this_round + 1 == num_stock_rank_count) (*tasks_rank)[num_rank_op][task_index][step] = memory_.scalar_[instruction->in1_];
@@ -2321,40 +1689,23 @@ bool Executor<F>::TrainOptImpl(const IntegerT max_steps,
           break;  
         }
         case 73: { 
-          // cout << "code run here case 73" <<  endl;
-
-          if ((this_round + 1 > num_stock_rank_count && num_stock_rank_count > 0) && step > (13 * (*num_TS_rank) + 12)) { /// if step is larger then 12, means there are 13 steps before you can compare
-            if (task_index > 149) {
-              // cout << "this task: " <<  task_index << endl;
-              // cout << "instruction: " << instruction->ToString() << endl;      
-            }      
+          if ((this_round + 1 > num_stock_rank_count && num_stock_rank_count > 0) && step > (13 * (*num_TS_rank) + 12)) { /// if step is larger then 12, means there are 13 steps before you can compare    
             IntegerT count = 0;
             for (IntegerT for_compare_step = step - 1 ; for_compare_step > (step - 2 - 12); --for_compare_step) { /// limit case is 0 to 12
               double count_out = 0.0;
               for (IntegerT for_compare = 0; for_compare < num_of_stocks_to_approximate_rank; ++for_compare) {
-                /// james: [(task_index - num_of_stocks_to_start_approximate * (num_rank_op)) % num_of_stocks_to_approximate_rank] to get the most recent stock saved row
                 if ((*tasks_rank)[num_rank_op][task_index][for_compare_step] > (*tasks_rank)[num_rank_op][for_compare][for_compare_step]) ++count_out;
-              //   if (task_index > 149) {
-              //   // cout << "(*tasks_rank)[" << num_rank_op << "][" << for_compare << "][" << for_compare_step << "]: " << (*tasks_rank)[num_rank_op][for_compare][for_compare_step] << endl;
-              //   // cout << "(*tasks_rank)[" << num_rank_op << "][" << task_index % num_of_stocks_to_approximate_rank << "][" << for_compare_step << "]: " << (*tasks_rank)[num_rank_op][task_index % num_of_stocks_to_approximate_rank][for_compare_step] << endl;
-              // }
               }
-            //                 if (task_index > 149) {
-            //   // cout << "count" << count << endl;
-            //   // cout << "count_out/num_of_stocks_to_approximate_rank" << count_out/num_of_stocks_to_approximate_rank << endl;
-            // }
               memory_.vector_[instruction->out_](count) = count_out/num_of_stocks_to_approximate_rank;
               ++count;
             }
           }
-
           // save in1 of current num_rank_op when it can't be read; put behind the previous if because we cannot change what to compare before we compare it after task index of 9. to rule to random substitute a stock e.g. -1 < task_index < 10 or 9 < task_index < 20 or  19 < task_index < 30 ... 
           if ((this_round + 1 == num_stock_rank_count) && (13 * ((*num_TS_rank) - 1) + 12) < step) {
             (*tasks_rank)[num_rank_op][task_index][step] = memory_.scalar_[instruction->in1_];
           }
           if (!((this_round + 1 > num_stock_rank_count && num_stock_rank_count > 0) && step > (13 * (*num_TS_rank) + 12))) if_skip_this_sample = true;
 
-          // ++this_num_TS_rank_count;
           ++(*num_stock_rank);
           ++(*num_TS_rank);        
 
@@ -2373,7 +1724,6 @@ bool Executor<F>::TrainOptImpl(const IntegerT max_steps,
           }
           if (!(step > (13 * (*num_TS_rank) + 12))) if_skip_this_sample = true;
 
-          // ++this_num_TS_rank_count;
           ++(*num_TS_rank);        
 
           break;
@@ -2385,33 +1735,20 @@ bool Executor<F>::TrainOptImpl(const IntegerT max_steps,
       if (if_skip_this_sample) break;
 
       ++num_rank_op;
-      // cout << "train noop rank:" << out << endl;
       ExecuteMyInstruction(*instruction, rand_gen_, &memory_, features);
-      // cout << "opt instruction->out_" << memory_.scalar_[instruction->out_] << endl;
       ++ins_count;            
      } else {
       ExecuteMyInstruction(*instruction, rand_gen_, &memory_, features);
-      // cout << "opt instruction->out_" << memory_.scalar_[instruction->out_] << endl;
       ++ins_count;
      }
     }
 
-    // James: allow all to sigmod because predicting return
-    // if (dataset_.eval_type_ == ACCURACY) {
-    // James: comment off converter to try log ret
+    // allow all to sigmod because predicting return
     ProbabilityConverter<F>::Convert(&memory_);
-    // }
     // Check whether we should stop early.
     const Scalar& label = train_it->GetLabel();
-    // for (IntegerT i = 0; i < F; ++i) {
-    //   if (std::abs((features[i])) == 0.446742 && std::abs((features[i+1])) == 0.477358) {
-    //     cout << "features[i] I want" << features[i] << endl;
-    //     cout << "label I want" << label << endl;
-    //     CHECK(std::abs((features[i+2])) == 0.477358);
-    //   }
-    // }
+
     if (std::abs(label) == 1234 || if_skip_this_sample) {
-      // cout << "label" << label << endl;
       train_it->Next();
       if (train_it->Done()) {
         break;  // Reached the end of the dataset.
@@ -2430,12 +1767,10 @@ bool Executor<F>::TrainOptImpl(const IntegerT max_steps,
     if (CheckFeature(features)) {
       train_it->Next();
       if (train_it->Done()) {
-            // cout << "code run here 4 " << endl;
         break;  // Reached the end of the dataset.
       }
       continue;
     }
-    // cout << " features learn component function = " << features << endl;
     LabelAssigner<F>::Assign(label, &memory_);
     IntegerT learn_instr_num = 0;
     for (const Instruction& instruction : optimized_learn_component_function) {
@@ -2446,7 +1781,6 @@ bool Executor<F>::TrainOptImpl(const IntegerT max_steps,
         ++learn_instr_num;
         continue;
       }      
-      // cout << "optimized learn run instruction" << instruction.ToString() << endl;
       ExecuteMyInstruction(instruction, rand_gen_, &memory_, features);
       ++learn_instr_num;
     }
@@ -2454,7 +1788,6 @@ bool Executor<F>::TrainOptImpl(const IntegerT max_steps,
     // Check whether we are done.
     train_it->Next();
     if (train_it->Done()) {
-          // cout << "code run here 4 " << endl;
       break;  // Reached the end of the dataset.
     }
   }
@@ -2470,10 +1803,7 @@ struct SquashedRmseLossAccumulator {
       const Memory<F>& memory, const Scalar& label,
       double* error, double* loss, double* pred) {
     *pred = 2 * Sigmoid(memory.scalar_[kPredictionsScalarAddress]) - 1;
-    // cout << "memory.scalar_[kPredictionsScalarAddress]" << memory.scalar_[kPredictionsScalarAddress] << endl;
     *error = label - *pred;
-    // cout << " memory.scalar_[kPredictionsScalarAddress] = " << memory.scalar_[kPredictionsScalarAddress] << endl;
-    // cout << " label = " << label << endl;
     if (std::abs(*error) > 4) {
       "here here label is wrong!!!";
       cout << "label" << label << endl;
@@ -2490,9 +1820,8 @@ struct ProbAccuracyLossAccumulator {
       double* error, double* loss, double* pred) {
     double logit = memory.scalar_[kPredictionsScalarAddress];
     double pred_prob = Sigmoid(logit);
-    // james: why I use *pred += pred_prob; below???? answer: should be wrongly following the error accumulator. loss should be accumulated but not pred.
     *pred = pred_prob; 
-    // james: added isnan(pred_prob) to below because nan compare with 0.5 would return false than is_correct is true. This would assign no loss.
+    // added isnan(pred_prob) to below because nan compare with 0.5 would return false than is_correct is true. This would assign no loss.
     if ((pred_prob > 1.0) || (pred_prob < 0.0) || isnan(pred_prob)) {
       *error = std::numeric_limits<double>::infinity();
     } else {
@@ -2507,7 +1836,6 @@ template <FeatureIndexT F>
 double Executor<F>::Validate(std::vector<double>* errors, std::vector<double>* preds, std::vector<double>* price_diff, std::vector<std::vector<std::vector<double>>>* tasks_rank, IntegerT this_round, IntegerT task_index, IntegerT* num_stock_rank, IntegerT* num_TS_rank, const IntegerT num_of_stocks_to_approximate_rank, std::vector<IntegerT> *useful_list) {
   double loss = 0.0;
   double skip_sample = 0;
-    // cout << "code run here 5 " << endl;
   if (errors != nullptr) {
     errors->reserve(dataset_.ValidSteps());
   }
@@ -2520,21 +1848,6 @@ double Executor<F>::Validate(std::vector<double>* errors, std::vector<double>* p
 
   vector<double> relatiion_start_list = {0,36,69,74,79,235,237,369,386,387,406,411,452,464,508,524,530,539,543,551,553,570,599,605,616,622,635,643,661,663,670,671,691,700,701,707,718,721,724,726,730,732,734,744,749,757,764,767,775,782,802,805,809,813,816,822,825,830,833,837,843,850,852,860,862,866,869,875,880,882,890,891,896,898,903,904,908,910,915,921,928,940,946,952,954,957,964,965,966,971,975,979,984,992,994,995,997,1000,1003,1004,1005,1007,1008,1009,1010,1012,1014,1018,1020,1021,1022,1024,1025};
 
-  // static IntegerT previous_relation = -1;
-  // static IntegerT current_relation = -1;
-  // static IntegerT current_relation_count;
-
-  // cout << "dataset_.industry_relation_ validate" << dataset_.industry_relation_ << endl;
-  // cout << "current_relation_count validate" << current_relation_count << endl;
-  // cout << "previous_relation valid" << previous_relation << endl;
-  // cout << "current_relation valid" << current_relation << endl;
-  // if (dataset_.industry_relation_ == current_relation) {
-  //   previous_relation = current_relation; // comparing the real current (dataset_.industry_relation_) with the actual previous (current_relation)
-  // } else current_relation_count = 0;
-  // current_relation = dataset_.industry_relation_;
-  // ++current_relation_count;
-  
-
   const IntegerT num_steps =
       std::min(num_valid_examples_,
                static_cast<IntegerT>(dataset_.ValidSteps()));
@@ -2543,14 +1856,6 @@ double Executor<F>::Validate(std::vector<double>* errors, std::vector<double>* p
       "You should only record the validation errors for few validation steps."
       << std::endl;
 
-      /// james: cancelled since allow fec
-      /// james: below to check if rank op can be saved or extracted in the task_rank matrix.
-  // if (1220 - 988 != num_steps) 
-  // {
-  //   cout << "code run ehere!!!feature done" << endl;
-  //   CHECK(num_steps == 999);
-  // }
-
   TaskIterator<F> valid_it = dataset_.ValidIterator();
   for (IntegerT step = 0; step < num_steps; ++step) {
     // Run predict component function for this example.
@@ -2558,45 +1863,17 @@ double Executor<F>::Validate(std::vector<double>* errors, std::vector<double>* p
     if (CheckFeature(features)) {
       if (preds != nullptr) {
         preds->push_back(-1234);
-        // cout << "pred" << pred << endl;
       }
       if (price_diff != nullptr) {
         price_diff->push_back(-1234);
-        // if (std::abs(valid_it.GetPriceDiff()) > 1000) 
-        //   cout << "std::abs(valid_it.GetPriceDiff()) < 1000" << valid_it.GetPriceDiff() << endl;
-        // CHECK(std::abs(valid_it.GetPriceDiff()) < 1000);
       }
 
       ++skip_sample;
       valid_it.Next();
-      if (valid_it.Done()) {
-    // cout << "code run here 6 " << endl;
-        if (preds->empty()) {
-          cout << "code run ehere!!!feature done" << endl;
-          cout << "task_index" << task_index << endl;
-          for (const std::shared_ptr<const Instruction>& instruction :
-               algorithm_.predict_) {    
-            cout << "instruction->string: " <<instruction->ToString() << endl;
-            cout << "instruction->out_" << memory_.scalar_[instruction->out_] << endl;
-            cout << "instruction->in1_" << memory_.scalar_[instruction->in1_] << endl;
-          }     
-        }
-        if (preds->size() == 0) {
-          cout << "code run ehere!!!feature done size" << endl;
-          cout << "task_index" << task_index << endl;
-          for (const std::shared_ptr<const Instruction>& instruction :
-               algorithm_.predict_) {    
-            cout << "instruction->string: " <<instruction->ToString() << endl;
-            cout << "instruction->out_" << memory_.scalar_[instruction->out_] << endl;
-            cout << "instruction->in1_" << memory_.scalar_[instruction->in1_] << endl;
-          }     
-        }
-        break; 
-      }
+
       continue;
     }
     memory_.matrix_[kFeaturesMatrixAddress] = features;
-    // cout << " features = " << features << endl;
     ZeroLabelAssigner<F>::Assign(&memory_);
 
     IntegerT ins_count = 0;
@@ -2623,8 +1900,6 @@ double Executor<F>::Validate(std::vector<double>* errors, std::vector<double>* p
 
         if (instruction->op_ == 65 || instruction->op_ == 66 || instruction->op_ == 72 || instruction->op_ == 75) {
           if(isnan(memory_.scalar_[instruction->in1_])) {
-            // if(!CheckHasIn(&algorithm_, ins_count, instruction->in1_) || isnan(memory_.scalar_[instruction->in1_])) {
-            // cout << "instruction: " << instruction->ToString() << endl;
             ++ins_count;
             continue;
           }
@@ -2632,157 +1907,78 @@ double Executor<F>::Validate(std::vector<double>* errors, std::vector<double>* p
           if (instruction->op_ == 72) ++num_TS_rank_count;
         } else if (instruction->op_ == 73) {
           if(isnan(memory_.scalar_[instruction->in1_])) {
-              // if(!CheckHasIn(&algorithm_, ins_count, instruction->in1_) || isnan(memory_.scalar_[instruction->in1_])) {
-              // cout << "instruction: " << instruction->ToString() << endl;
               ++ins_count;
               continue;
             }
           ++num_stock_rank_count;
           ++num_TS_rank_count;         
         }
-      // cout << "(*tasks_rank)[" << num_rank_op << "][" << this_round << "]step[" << step <<  "]: " << "instruction->in1_" << memory_.scalar_[instruction->in1_] << endl;
 
-      // IntegerT length = (*tasks_rank)[num_rank_op][this_round].size();
-      // cout << "length" << length << endl;
-      // IntegerT stock_length = (*tasks_rank)[num_rank_op].size();
-      // cout << "stock_length" << stock_length << endl;
       switch (instruction->op_) {
         case 75: {
-
-
-
-          // cout << "dataset_.industry_relation_ no op" << dataset_.industry_relation_ << endl;
-          // cout << "current_relation_count no op" << current_relation_count << endl;
-          // cout << "previous_relation no op" << previous_relation << endl;
-          // cout << "current_relation no op" << current_relation << endl;
-          /// james: comment off num_stock_rank count because in relation rank, each stock before industry is inevitablely ignored
-          // ++(*num_stock_rank);
-          if (((this_round + 1) > num_stock_rank_count) && num_stock_rank_count > 0) {
-          // if (dataset_.industry_relation_ == previous_relation && current_relation_count > (num_of_stocks_to_start_approximate * (num_rank_op) + (num_of_stocks_to_start_approximate - 1))) {
-            // if (task_index > 149) {
-            //   // cout << "this task: " <<  task_index << endl;
-            //   // cout << "instruction: " << instruction->ToString() << endl;      
-            // }      
+          if (((this_round + 1) > num_stock_rank_count) && num_stock_rank_count > 0) {     
             IntegerT relation_len;
             if (dataset_.industry_relation_ != 112) relation_len = relatiion_start_list[dataset_.industry_relation_ + 1] - relatiion_start_list[dataset_.industry_relation_];
             else relation_len = 1;
             if (relation_len > 5) {
-              // james: allow num_of_stocks_to_start_approximate to enter rank but allow compare to up to num_of_stocks_to_approximate_rank number of stocks
               for (IntegerT for_compare = relatiion_start_list[dataset_.industry_relation_]; for_compare < relatiion_start_list[dataset_.industry_relation_ + 1]; ++for_compare) {
-                // cout << "out: " << out << endl;
-                // cout << "(*tasks_rank)[" << num_rank_op << "][" << for_compare << "][" << step << "]: " << (*tasks_rank)[num_rank_op][for_compare][step] << endl;
                 out+=(*tasks_rank)[num_rank_op][for_compare][step + 988];
-                  // if (task_index > 149) {
-                  //   // cout << "(*tasks_rank)[" << num_rank_op << "][" << for_compare << "][" << step << "]: " << (*tasks_rank)[num_rank_op][for_compare][step] << endl;
-                  //   // cout << "instruction->in1_" << instruction->in1_ << endl;
-                  // }
               }                
             } else memory_.scalar_[instruction->out_] = 0;
 
-          //           if (task_index > 149) {
-          //   // cout << "out/num_of_stocks_to_approximate_rank" << out/num_of_stocks_to_approximate_rank << endl;
-          // }
-            // out += memory_.scalar_[instruction->in1_];
             memory_.scalar_[instruction->out_] = memory_.scalar_[instruction->in1_] - out/relation_len;
-            // cout << "memory_.scalar_[instruction->out_]: " << memory_.scalar_[instruction->out_] << endl;
-            // cout << "average: " << out/(std::min(num_of_stocks_to_approximate_rank, (current_relation_count - num_of_stocks_to_start_approximate * (num_rank_op))) + 1);
           }
 
           if ((this_round + 1) == num_stock_rank_count) {
             (*tasks_rank)[num_rank_op][task_index][step + 988] = memory_.scalar_[instruction->in1_];
           }
-          // if(!(((this_round + 1) > num_stock_rank_count) && num_stock_rank_count > 0)) if_skip_this_sample = true;
 
           break;  
         }
         case 65: {
-
-          /// james: comment off num_stock_rank count because in relation rank, each stock before industry is inevitablely ignored
-          // ++(*num_stock_rank);
-          if (((this_round + 1) > num_stock_rank_count) && num_stock_rank_count > 0) {
-            // if (task_index > 149) {
-            //   // cout << "this task: " <<  task_index << endl;
-            //   // cout << "instruction: " << instruction->ToString() << endl;      
-            // }      
-
+          if (((this_round + 1) > num_stock_rank_count) && num_stock_rank_count > 0) {  
             IntegerT relation_len;
             if (dataset_.industry_relation_ != 112) relation_len = relatiion_start_list[dataset_.industry_relation_ + 1] - relatiion_start_list[dataset_.industry_relation_];
             else relation_len = 1;
             if (relation_len > 5) {
-              // james: allow num_of_stocks_to_start_approximate to enter rank but allow compare to up to num_of_stocks_to_approximate_rank number of stocks
               for (IntegerT for_compare = relatiion_start_list[dataset_.industry_relation_]; for_compare < relatiion_start_list[dataset_.industry_relation_ + 1]; ++for_compare) {
                 if (memory_.scalar_[instruction->in1_] > (*tasks_rank)[num_rank_op][for_compare][step + 988]) {
-                  // cout << "out: " << out << endl;
-                  // cout << "(*tasks_rank)[" << num_rank_op << "][" << for_compare << "][" << step << "]: " << (*tasks_rank)[num_rank_op][for_compare][step] << endl;
                   ++out;
                 }
-                  
-                  // if (task_index > 149) {
-                  //   // cout << "(*tasks_rank)[" << num_rank_op << "][" << for_compare << "][" << step << "]: " << (*tasks_rank)[num_rank_op][for_compare][step] << endl;
-                  //   // cout << "instruction->in1_" << instruction->in1_ << endl;
-                  // }
               }
-            //           if (task_index > 149) {
-            //   // cout << "out/num_of_stocks_to_approximate_rank" << out/num_of_stocks_to_approximate_rank << endl;
-            // }
+
               memory_.scalar_[instruction->out_] = out/relation_len;
-              // cout << "memory_.scalar_[instruction->out_]: " << memory_.scalar_[instruction->out_] << endl;
             } else memory_.scalar_[instruction->out_] = 0;
           }
           // save in1 of current num_rank_op when it can't be read; put behind the previous if because we cannot change what to compare before we compare it after task index of 9. to rule to random substitute a stock
           if ((this_round + 1) == num_stock_rank_count) {
             (*tasks_rank)[num_rank_op][task_index][step + 988] = memory_.scalar_[instruction->in1_];
           }
-          // if(!((this_round + 1) > num_stock_rank_count && num_stock_rank_count > 0)) if_skip_this_sample = true;
-
           break;  
         }
         case 66: {
           ++(*num_stock_rank);
           
-          if (this_round + 1 > num_stock_rank_count && num_stock_rank_count > 0) {
-            if (task_index > 149) {
-              // cout << "this task: " <<  task_index << endl;
-              // cout << "instruction: " << instruction->ToString() << endl;      
-            }      
+          if (this_round + 1 > num_stock_rank_count && num_stock_rank_count > 0) { 
             for (IntegerT for_compare = 0; for_compare < num_of_stocks_to_approximate_rank; ++for_compare) {
               if (memory_.scalar_[instruction->in1_] > (*tasks_rank)[num_rank_op][for_compare][step + 988]) {
                 ++out;
               }
-
             }
             memory_.scalar_[instruction->out_] = out/(num_of_stocks_to_approximate_rank);
-            
           }
           // save in1 of current num_rank_op when it can't be read; put behind the previous if because we cannot change what to compare before we compare it after task index of 9. to rule to random substitute a stock
           if (this_round + 1 == num_stock_rank_count) (*tasks_rank)[num_rank_op][task_index][step + 988] = memory_.scalar_[instruction->in1_];
-          // if(!(this_round + 1 > num_stock_rank_count && num_stock_rank_count > 0)) if_skip_this_sample = true;
-
           break;  
         }
         case 73: { 
-          // cout << "code run here case 73" <<  endl;
-
-          if ((this_round + 1 > num_stock_rank_count && num_stock_rank_count > 0) && step > (13 * (*num_TS_rank) + 12)) { /// if step is larger then 12, means there are 13 steps before you can compare
-            if (task_index > 149) {
-              // cout << "this task: " <<  task_index << endl;
-              // cout << "instruction: " << instruction->ToString() << endl;      
-            }      
+          if ((this_round + 1 > num_stock_rank_count && num_stock_rank_count > 0) && step > (13 * (*num_TS_rank) + 12)) { /// if step is larger then 12, means there are 13 steps before you can compare     
             IntegerT count = 0;
             for (IntegerT for_compare_step = step - 1 ; for_compare_step > (step - 2 - 12); --for_compare_step) { /// limit case is 0 to 12
               double count_out = 0.0;
               for (IntegerT for_compare = 0; for_compare < num_of_stocks_to_approximate_rank; ++for_compare) {
-                /// james: [(task_index - num_of_stocks_to_start_approximate * (num_rank_op)) % num_of_stocks_to_approximate_rank] to get the most recent stock saved row
                 if ((*tasks_rank)[num_rank_op][task_index][for_compare_step + 988] > (*tasks_rank)[num_rank_op][for_compare][for_compare_step + 988]) ++count_out;
-              //   if (task_index > 149) {
-              //   // cout << "(*tasks_rank)[" << num_rank_op << "][" << for_compare << "][" << for_compare_step << "]: " << (*tasks_rank)[num_rank_op][for_compare][for_compare_step] << endl;
-              //   // cout << "(*tasks_rank)[" << num_rank_op << "][" << task_index % num_of_stocks_to_approximate_rank << "][" << for_compare_step << "]: " << (*tasks_rank)[num_rank_op][task_index % num_of_stocks_to_approximate_rank][for_compare_step] << endl;
-              // }
               }
-            //                 if (task_index > 149) {
-            //   // cout << "count" << count << endl;
-            //   // cout << "count_out/num_of_stocks_to_approximate_rank" << count_out/num_of_stocks_to_approximate_rank << endl;
-            // }
               memory_.vector_[instruction->out_](count) = count_out/num_of_stocks_to_approximate_rank;
               ++count;
             }
@@ -2792,9 +1988,6 @@ double Executor<F>::Validate(std::vector<double>* errors, std::vector<double>* p
           if ((this_round + 1 == num_stock_rank_count) && (13 * ((*num_TS_rank) - 1) + 12) < step) {
             (*tasks_rank)[num_rank_op][task_index][step + 988] = memory_.scalar_[instruction->in1_];
           }
-          // if (!((this_round + 1 > num_stock_rank_count && num_stock_rank_count > 0) && step > (13 * (*num_TS_rank) + 12))) if_skip_this_sample = true;
-
-          // ++this_num_TS_rank_count;
           ++(*num_stock_rank);
           ++(*num_TS_rank);        
 
@@ -2811,9 +2004,7 @@ double Executor<F>::Validate(std::vector<double>* errors, std::vector<double>* p
           if ((13 * ((*num_TS_rank) - 1) + 12) < step) {
             (*tasks_rank)[num_rank_op][task_index][step + 988] = memory_.scalar_[instruction->in1_];
           }
-          // if (!(step > (13 * (*num_TS_rank) + 12))) if_skip_this_sample = true;
 
-          // ++this_num_TS_rank_count;
           ++(*num_TS_rank);        
 
           break;
@@ -2823,7 +2014,6 @@ double Executor<F>::Validate(std::vector<double>* errors, std::vector<double>* p
       }
 
       ++num_rank_op;
-      // cout << "train noop rank:" << out << endl;
       ExecuteMyInstruction(*instruction, rand_gen_, &memory_, features);
       ++ins_count;            
      } else {
@@ -2838,48 +2028,17 @@ double Executor<F>::Validate(std::vector<double>* errors, std::vector<double>* p
     double pred = 0.0;
     const Scalar& label = valid_it.GetLabel();
     if (std::abs(label) == 1234) {
-      // cout << "label" << label << endl;
-      // cout << "label wrong is captured" << endl;
+
       if (preds != nullptr) {
         preds->push_back(-1234);
-        // cout << "pred" << pred << endl;
       }
       if (price_diff != nullptr) {
         price_diff->push_back(-1234);
-        // if (std::abs(valid_it.GetPriceDiff()) > 1000) 
-        //   cout << "std::abs(valid_it.GetPriceDiff()) < 1000" << valid_it.GetPriceDiff() << endl;
-        // CHECK(std::abs(valid_it.GetPriceDiff()) < 1000);
       }
 
       ++skip_sample;
       valid_it.Next();
-      if (valid_it.Done()) {
-            // cout << "code run here 6 " << endl;
 
-        if (preds->empty()) {
-          cout << "code run ehere!!!label done" << endl;
-          cout << "task_index" << task_index << endl;
-          for (const std::shared_ptr<const Instruction>& instruction :
-               algorithm_.predict_) {    
-            cout << "instruction->string: " <<instruction->ToString() << endl;
-            cout << "instruction->out_" << memory_.scalar_[instruction->out_] << endl;
-            cout << "instruction->in1_" << memory_.scalar_[instruction->in1_] << endl;
-          }
-          cout << "pred: " << pred << endl;        
-        }
-        if (preds->size() == 0) {
-          cout << "code run ehere!!!label done size" << endl;
-          cout << "task_index" << task_index << endl;
-          for (const std::shared_ptr<const Instruction>& instruction :
-               algorithm_.predict_) {    
-            cout << "instruction->string: " <<instruction->ToString() << endl;
-            cout << "instruction->out_" << memory_.scalar_[instruction->out_] << endl;
-            cout << "instruction->in1_" << memory_.scalar_[instruction->in1_] << endl;
-          }
-          cout << "pred: " << pred << endl;        
-        }
-        break; 
-      }
       continue;
     }
     switch (dataset_.eval_type_) {
@@ -2898,34 +2057,14 @@ double Executor<F>::Validate(std::vector<double>* errors, std::vector<double>* p
       // Do not add default case here. All enum values should be supported.
     }
     const double abs_error = std::abs(error);
-    // James: nan compare with 0.5 would return false. So the above Accumulate function is allowing nan compare with 0.5. 
-    // James: This would return false than is_correct is true. This would assign no loss.
-    // James: This condition check is preventing any results push_back into preds when I do RMS loss. What is the max_abs_error?
-    if (abs_error > max_abs_error_) {
-      cout << "max_abs_error_" << max_abs_error_ << endl;
-      cout << "abs_error" << abs_error << endl;
-    }
-
-    // if (isnan(pred)) {
-    //   cout << "abs_error" << abs_error << endl;
-    // }
 
     if (isnan(abs_error) || abs_error > max_abs_error_ || isnan(pred)) {
-      // cout << "code run ehere!!!pred is nan" << endl;
-      // cout << "task_index" << task_index << endl;
-      // for (const std::shared_ptr<const Instruction>& instruction :
-      //      algorithm_.predict_) {    
-      //   cout << "instruction->string: " <<instruction->ToString() << endl;
-      //   cout << "instruction->out_" << memory_.scalar_[instruction->out_] << endl;
-      //   cout << "instruction->in1_" << memory_.scalar_[instruction->in1_] << endl;
-      // }
-      // if stop early then no point keeping a half vector containing half preds
+
       if (preds != nullptr && price_diff != nullptr) {
         preds->clear();
         price_diff->clear();
       }
-      // cout << "here preds are cleared!!!" << endl;
-      // CHECK(pred == 999);
+
       // Stop early. Return infinite loss.
       return kMinFitness;
     }
@@ -2935,46 +2074,12 @@ double Executor<F>::Validate(std::vector<double>* errors, std::vector<double>* p
     }
     if (preds != nullptr) {
       preds->push_back(pred);
-      // cout << "pred" << pred << endl;
-    } else {
-      // cout << " preds == nullptr!!!!! " << endl;
-    }
+    } 
     if (price_diff != nullptr) {
       price_diff->push_back(valid_it.GetLabel());
-      // if (std::abs(valid_it.GetPriceDiff()) > 1000) 
-      //   cout << "std::abs(valid_it.GetPriceDiff()) < 1000" << valid_it.GetPriceDiff() << endl;
-      // CHECK(std::abs(valid_it.GetPriceDiff()) < 1000);
     }
 
     valid_it.Next();
-    if (valid_it.Done()) {
-          // cout << "code run here 6 " << endl;
-      if (preds->empty()) {
-        cout << "code run ehere!!!" << endl;
-        cout << "task_index" << task_index << endl;
-        for (const std::shared_ptr<const Instruction>& instruction :
-             algorithm_.predict_) {    
-          cout << "instruction->string: " <<instruction->ToString() << endl;
-          cout << "instruction->out_" << memory_.scalar_[instruction->out_] << endl;
-          cout << "instruction->in1_" << memory_.scalar_[instruction->in1_] << endl;
-        }
-        cout << "pred: " << pred << endl;        
-      }
-      if (preds->size() == 0) {
-        cout << "code run ehere!!!normal done size" << endl;
-        cout << "task_index" << task_index << endl;
-        for (const std::shared_ptr<const Instruction>& instruction :
-             algorithm_.predict_) {    
-          cout << "instruction->string: " <<instruction->ToString() << endl;
-          cout << "instruction->out_" << memory_.scalar_[instruction->out_] << endl;
-          cout << "instruction->in1_" << memory_.scalar_[instruction->in1_] << endl;
-        }
-        cout << "pred: " << pred << endl;        
-      }
-      // james: added below was to check if preds has 0 size
-      // cout << " preds.size() " << preds->size() << endl;
-      break;  // Reached the end of the dataset.
-    }
   }
 
   // Convert to fitness.
@@ -2984,7 +2089,6 @@ double Executor<F>::Validate(std::vector<double>* errors, std::vector<double>* p
       LOG(FATAL) << "Invalid eval type." << std::endl;
     case RMS_ERROR:
       loss /= (static_cast<double>(dataset_.ValidSteps()) - static_cast<double>(skip_sample));
-      // cout << "skip_sample" << skip_sample << endl;
       fitness = FlipAndSquash(sqrt(loss));
       break;
     case ACCURACY:
@@ -3013,7 +2117,6 @@ void ExecuteAndFillLabels(const Algorithm& algorithm, Memory<F>* memory,
   for (const Matrix<F>& train_features : buffer->train_features_) {
     // Run predict component function for this example.
     memory->matrix_[kFeaturesVectorAddress] = train_features;
-    // cout << " train_features = " << train_features << endl;
     ZeroLabelAssigner<F>::Assign(memory);
     for (const std::shared_ptr<const Instruction>& instruction :
          algorithm.predict_) {
@@ -3086,7 +2189,6 @@ inline FeatureIndexT Argmax(const Vector<F>& input) {
       max_element = input(index);
     }
   }
-  cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Max index = " << max_index << endl;
   return max_index;
 }
 
