@@ -5,3 +5,5 @@ Name of third Party Code     Purpose	  Link to Third Party Code	 Link to Third P
 AutoML-Zero Github	Providing the base framework, including the evolutionary algorithm and the basic operations.	https://github.com/google-research/google-research/tree/master/automl_zero	http://www.apache.org/licenses/LICENSE-2.0
 
 Temporal Relational Stock Ranking Github 	Using source data 	https://github.com/fulifeng/Temporal_Relational_Stock_Ranking	     
+
+Please see the details about the environments required in the link of AutoML-Zero github.
